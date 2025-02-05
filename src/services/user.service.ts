@@ -35,13 +35,6 @@ class UserService {
     await userRepository.deleteById(tokenPayload.userId);
   }
 
-  public async isEmailUnique(email: string): Promise<void> {
-    const user = await userRepository.getByEmail(email);
-    if (user) {
-      throw new ApiError("Email is already in use", 409);
-    }
-  }
-
   public async getUserById(userId: string): Promise<IUser> {
     const user = await userRepository.getById(userId);
     if (!user) {

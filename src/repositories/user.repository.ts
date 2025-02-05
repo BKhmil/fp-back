@@ -1,4 +1,4 @@
-import { IUser, IUserCreateDto } from "../interfaces/user.interface";
+import { ISignUpDto, IUser } from "../interfaces/user.interface";
 import { User } from "../models/user.model";
 
 class UserRepository {
@@ -6,7 +6,7 @@ class UserRepository {
     return await User.find();
   }
 
-  public async create(dto: IUserCreateDto): Promise<IUser> {
+  public async create(dto: ISignUpDto): Promise<IUser> {
     return await User.create(dto);
   }
 

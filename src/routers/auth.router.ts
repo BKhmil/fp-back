@@ -10,12 +10,14 @@ const router = Router();
 
 router.post(
   "/sign-up",
-  commonMiddleware.validateBody(UserValidator.create),
+  commonMiddleware.validateBody(UserValidator.signUp),
+  authMiddleware.checkEmail(true),
   authController.signUp,
 );
 router.post(
   "/sign-in",
-  commonMiddleware.validateBody(UserValidator.login),
+  commonMiddleware.validateBody(UserValidator.signIn),
+  authMiddleware.checkEmail(),
   authController.signIn,
 );
 
@@ -38,10 +40,12 @@ router.post(
   authController.forgotPassword,
 );
 router.put("/forgot-password", authController.forgotPasswordSet);
+
 router.put(
   "/change-password",
   commonMiddleware.validateBody(UserValidator.changePassword),
   authMiddleware.checkAccessToken,
+  authMiddleware.checkNewPasswordIsUnique,
   authController.changePassword,
 );
 

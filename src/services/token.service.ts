@@ -23,7 +23,7 @@ class TokenService {
     };
   }
 
-  public generateActionTokens(
+  public generateActionToken(
     payload: ITokenPayload,
     type: ActionTokenTypeEnum,
   ): string {
@@ -72,8 +72,8 @@ class TokenService {
       }
 
       return jwt.verify(token, secret) as ITokenPayload;
-    } catch (e) {
-      console.error(e.message);
+    } catch (err) {
+      console.error(err.message);
       throw new ApiError("Invalid token", 401);
     }
   }

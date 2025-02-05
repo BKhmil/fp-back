@@ -22,8 +22,9 @@ app.use(
     res.status(status).json({ status, message });
   },
 );
+
 process.on("uncaughtException", (error) => {
-  console.error("Uncaught Exception:", error);
+  console.error("Uncaught Exception: ", error);
   process.exit(1);
 });
 

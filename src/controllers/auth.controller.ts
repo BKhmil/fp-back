@@ -2,18 +2,18 @@ import { NextFunction, Request, Response } from "express";
 
 import { ITokenPayload } from "../interfaces/token.interface";
 import {
-  IChangePassword,
-  IForgotPassword,
-  IForgotPasswordSet,
-  ILogin,
-  IUserCreateDto,
+  IChangePasswordDto,
+  IForgotPasswordDto,
+  IForgotPasswordSetDto,
+  ISignInDto,
+  ISignUpDto,
 } from "../interfaces/user.interface";
 import { authService } from "../services/auth.service";
 
 class AuthController {
   public async signUp(req: Request, res: Response, next: NextFunction) {
     try {
-      const dto = req.body as IUserCreateDto;
+      const dto = req.body as ISignUpDto;
       const result = await authService.signUp(dto);
       res.status(201).json(result);
     } catch (e) {
@@ -23,7 +23,7 @@ class AuthController {
 
   public async signIn(req: Request, res: Response, next: NextFunction) {
     try {
-      const dto = req.body as ILogin;
+      const dto = req.body as ISignInDto;
       const result = await authService.signIn(dto);
       res.status(201).json(result);
     } catch (e) {
@@ -73,7 +73,7 @@ class AuthController {
 
   public async forgotPassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const dto = req.body as IForgotPassword;
+      const dto = req.body as IForgotPasswordDto;
       await authService.forgotPassword(dto);
       res.sendStatus(201);
     } catch (e) {
@@ -87,7 +87,7 @@ class AuthController {
     next: NextFunction,
   ) {
     try {
-      const dto = req.body as IForgotPasswordSet;
+      const dto = req.body as IForgotPasswordSetDto;
       await authService.forgotPasswordSet(dto);
       res.sendStatus(201);
     } catch (e) {
@@ -109,7 +109,7 @@ class AuthController {
   public async changePassword(req: Request, res: Response, next: NextFunction) {
     try {
       const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
-      const dto = req.body as IChangePassword;
+      const dto = req.body as IChangePasswordDto;
       await authService.changePassword(dto, tokenPayload);
       res.sendStatus(204);
     } catch (e) {

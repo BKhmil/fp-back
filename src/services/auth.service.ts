@@ -4,12 +4,12 @@ import { EmailTypeEnum } from "../enums/email-type.enum";
 import { ApiError } from "../errors/api.error";
 import { ITokenPair, ITokenPayload } from "../interfaces/token.interface";
 import {
-  IChangePassword,
-  IForgotPassword,
-  IForgotPasswordSet,
-  ILogin,
+  IChangePasswordDto,
+  IForgotPasswordDto,
+  IForgotPasswordSetDto,
+  ISignInDto,
+  ISignUpDto,
   IUser,
-  IUserCreateDto,
 } from "../interfaces/user.interface";
 import { actionTokenRepository } from "../repositories/action-token.repository";
 import { oldPasswordRepository } from "../repositories/old-password.repository";
@@ -18,27 +18,24 @@ import { userRepository } from "../repositories/user.repository";
 import { emailService } from "./email.service";
 import { passwordService } from "./password.service";
 import { tokenService } from "./token.service";
-import { userService } from "./user.service";
 
 class AuthService {
   public async signUp(
-    dto: IUserCreateDto,
+    dto: ISignUpDto,
   ): Promise<{ user: IUser; tokens: ITokenPair }> {
-    await userService.isEmailUnique(dto.email);
     const password = await passwordService.hashPassword(dto.password);
     const user = await userRepository.create({ ...dto, password });
+
     const tokens = tokenService.generateTokens({
       userId: user._id,
       name: user.name,
-      isVerified: user.isVerified,
     });
     await tokenRepository.create({ ...tokens, _userId: user._id });
 
-    const token = tokenService.generateActionTokens(
-      { userId: user._id, name: user.name, isVerified: user.isVerified },
+    const token = tokenService.generateActionToken(
+      { userId: user._id, name: user.name },
       ActionTokenTypeEnum.VERIFY_EMAIL,
     );
-
     await actionTokenRepository.create({
       token,
       type: ActionTokenTypeEnum.VERIFY_EMAIL,
@@ -59,12 +56,10 @@ class AuthService {
   }
 
   public async signIn(
-    dto: ILogin,
+    dto: ISignInDto,
   ): Promise<{ user: IUser; tokens: ITokenPair }> {
     const user = await userRepository.getByEmail(dto.email);
-    if (!user) {
-      throw new ApiError("Incorrect email or password", 401);
-    }
+
     const isPasswordCorrect = await passwordService.comparePassword(
       dto.password,
       user.password,
@@ -75,7 +70,6 @@ class AuthService {
     const tokens = tokenService.generateTokens({
       userId: user._id,
       name: user.name,
-      isVerified: user.isVerified,
     });
     await tokenRepository.create({ ...tokens, _userId: user._id });
     return { user, tokens };
@@ -86,7 +80,10 @@ class AuthService {
     refreshToken: string,
   ): Promise<ITokenPair> {
     await tokenRepository.deleteOneByParams({ refreshToken });
-    const tokens = tokenService.generateTokens(tokenPayload);
+    const tokens = tokenService.generateTokens({
+      userId: tokenPayload.userId,
+      name: tokenPayload.name,
+    });
     await tokenRepository.create({ ...tokens, _userId: tokenPayload.userId });
     return tokens;
   }
@@ -112,12 +109,12 @@ class AuthService {
     });
   }
 
-  public async forgotPassword(dto: IForgotPassword): Promise<void> {
+  public async forgotPassword(dto: IForgotPasswordDto): Promise<void> {
     const user = await userRepository.getByEmail(dto.email);
     if (!user) return;
 
-    const token = tokenService.generateActionTokens(
-      { userId: user._id, name: user.name, isVerified: user.isVerified },
+    const token = tokenService.generateActionToken(
+      { userId: user._id, name: user.name },
       ActionTokenTypeEnum.FORGOT_PASSWORD,
     );
     await actionTokenRepository.create({
@@ -131,7 +128,7 @@ class AuthService {
     });
   }
 
-  public async forgotPasswordSet(dto: IForgotPasswordSet): Promise<void> {
+  public async forgotPasswordSet(dto: IForgotPasswordSetDto): Promise<void> {
     const payload = tokenService.verifyToken(
       dto.token,
       ActionTokenTypeEnum.FORGOT_PASSWORD,
@@ -145,11 +142,11 @@ class AuthService {
 
     const user = await userRepository.getById(payload.userId);
 
-    await this.isNewPasswordNewOrThrow(
-      dto.password,
-      user.password,
-      payload.userId,
-    );
+    // await this.isNewPasswordNewOrThrow(
+    //   dto.password,
+    //   user.password,
+    //   payload.userId,
+    // );
 
     await oldPasswordRepository.create({
       password: user.password,
@@ -159,10 +156,8 @@ class AuthService {
     const password = await passwordService.hashPassword(dto.password);
     await userRepository.updateById(payload.userId, { password });
 
-    await Promise.all([
-      actionTokenRepository.deleteOneByParams({ token: dto.token }),
-      tokenRepository.deleteAllByParams({ _userId: payload.userId }),
-    ]);
+    await actionTokenRepository.deleteOneByParams({ token: dto.token });
+    await tokenRepository.deleteAllByParams({ _userId: payload.userId });
   }
 
   public async verify(payload: ITokenPayload): Promise<void> {
@@ -174,7 +169,7 @@ class AuthService {
   }
 
   public async changePassword(
-    dto: IChangePassword,
+    dto: IChangePasswordDto,
     tokenPayload: ITokenPayload,
   ): Promise<void> {
     const user = await userRepository.getById(tokenPayload.userId);
@@ -186,11 +181,11 @@ class AuthService {
       throw new ApiError("Incorrect password", 401);
     }
 
-    await this.isNewPasswordNewOrThrow(
-      dto.newPassword,
-      user.password,
-      tokenPayload.userId,
-    );
+    // await this.isNewPasswordNewOrThrow(
+    //   dto.newPassword,
+    //   user.password,
+    //   tokenPayload.userId,
+    // );
 
     await oldPasswordRepository.create({
       password: user.password,
@@ -202,30 +197,30 @@ class AuthService {
     await tokenRepository.deleteAllByParams({ _userId: tokenPayload.userId });
   }
 
-  private async isNewPasswordNewOrThrow(
-    newPassword: string,
-    oldHashedPassword: string,
-    userId: string,
-  ): Promise<void> {
-    const isNewPasswordSameAsACurrent = await passwordService.comparePassword(
-      newPassword,
-      oldHashedPassword,
-    );
-    if (isNewPasswordSameAsACurrent) {
-      throw new ApiError("You can not set the old password", 401);
-    }
-
-    const docs = await oldPasswordRepository.getMany(userId);
-    for (const doc of docs) {
-      const isSame = await passwordService.comparePassword(
-        newPassword,
-        doc.password,
-      );
-      if (isSame) {
-        throw new ApiError("You can not set the old password", 401);
-      }
-    }
-  }
+  // private async isNewPasswordNewOrThrow(
+  //   newPassword: string,
+  //   oldHashedPassword: string,
+  //   userId: string,
+  // ): Promise<void> {
+  //   const isNewPasswordSameAsACurrent = await passwordService.comparePassword(
+  //     newPassword,
+  //     oldHashedPassword,
+  //   );
+  //   if (isNewPasswordSameAsACurrent) {
+  //     throw new ApiError("You can not set the old password", 401);
+  //   }
+  //
+  //   const docs = await oldPasswordRepository.getMany(userId);
+  //   for (const doc of docs) {
+  //     const isSame = await passwordService.comparePassword(
+  //       newPassword,
+  //       doc.password,
+  //     );
+  //     if (isSame) {
+  //       throw new ApiError("You can not set the old password", 401);
+  //     }
+  //   }
+  // }
 }
 
 export const authService = new AuthService();

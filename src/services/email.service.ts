@@ -4,8 +4,10 @@ import React from "react";
 
 import { envConfig } from "../configs/env.config";
 import { EmailTypeEnum } from "../enums/email-type.enum";
+import { ApiError } from "../errors/api.error";
 import { ForgotPasswordEmail } from "../templates/ForgotPassword";
 import { LogoutEmail } from "../templates/Logout";
+import { OldVisitEmail } from "../templates/OldVisit";
 import { WelcomeEmail } from "../templates/Welcome";
 import { EmailTypeToPayloadType } from "../types/email-type-to-payload.type";
 
@@ -52,8 +54,16 @@ class EmailService {
             }),
           );
           break;
+        case EmailTypeEnum.OLD_VISIT:
+          emailHtml = await render(
+            React.createElement(OldVisitEmail, {
+              context:
+                context as EmailTypeToPayloadType[EmailTypeEnum.OLD_VISIT],
+            }),
+          );
+          break;
         default:
-          throw new Error("Unknown email type");
+          throw new ApiError("Unknown email type", 500);
       }
 
       const options = {

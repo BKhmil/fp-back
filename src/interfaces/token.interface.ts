@@ -10,7 +10,6 @@ export interface IToken {
 export interface ITokenPayload {
   userId: string;
   name: string;
-  isVerified: boolean;
 }
 
 export type ITokenPair = Pick<IToken, "accessToken" | "refreshToken">;

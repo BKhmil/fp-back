@@ -8,19 +8,19 @@ export class UserValidator {
   private static email = joi.string().regex(regexConstant.EMAIL).trim();
   private static password = joi.string().regex(regexConstant.PASSWORD).trim();
 
-  public static create = joi.object({
+  public static signUp = joi.object({
     name: this.name.required(),
     age: this.age.required(),
     email: this.email.required(),
     password: this.password.required(),
   });
 
-  public static update = joi.object({
+  public static updateMe = joi.object({
     name: this.name,
     age: this.age,
   });
 
-  public static login = joi.object({
+  public static signIn = joi.object({
     email: this.email.required(),
     password: this.password.required(),
   });

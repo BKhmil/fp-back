@@ -10,16 +10,16 @@ export interface IUser {
   updatedAt: Date;
 }
 
-export type IUserCreateDto = Pick<IUser, "name" | "email" | "age" | "password">;
+export type ISignUpDto = Pick<IUser, "name" | "email" | "age" | "password">;
 
 export type IUserUpdateDto = Pick<IUser, "name" | "age">;
 
-export type ILogin = Pick<IUser, "email" | "password">;
+export type ISignInDto = Pick<IUser, "email" | "password">;
 
-export type IForgotPassword = Pick<IUser, "email">;
-export type IForgotPasswordSet = Pick<IUser, "password"> & { token: string };
+export type IForgotPasswordDto = Pick<IUser, "email">;
+export type IForgotPasswordSetDto = Pick<IUser, "password"> & { token: string };
 
-export type IChangePassword = {
+export type IChangePasswordDto = {
   oldPassword: string;
   newPassword: string;
 };

@@ -13,7 +13,7 @@ router.get("/me", authMiddleware.checkAccessToken, userController.getMe);
 router.put(
   "/me",
   authMiddleware.checkAccessToken,
-  commonMiddleware.validateBody(UserValidator.update),
+  commonMiddleware.validateBody(UserValidator.updateMe),
   userController.updateMe,
 );
 router.delete("/me", authMiddleware.checkAccessToken, userController.deleteMe);
