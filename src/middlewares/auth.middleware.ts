@@ -18,12 +18,6 @@ import { passwordService } from "../services/password.service";
 import { tokenService } from "../services/token.service";
 
 class AuthMiddleware {
-  public async verifyTokenSetTokenPayload(
-    req: Request,
-    res: Response,
-    next: NextFunction,
-  ) {}
-
   public async checkAccessToken(
     req: Request,
     res: Response,
@@ -93,13 +87,13 @@ class AuthMiddleware {
         if (!token) {
           throw new ApiError("Token is not provided", 401);
         }
-        const payload = tokenService.verifyToken(token, type);
 
         const tokenEntity = await actionTokenRepository.getByToken(token);
         if (!tokenEntity) {
           throw new ApiError("Token is not valid", 401);
         }
-        req.res.locals.tokenPayload = payload;
+
+        req.res.locals.tokenPayload = tokenService.verifyToken(token, type);
         next();
       } catch (err) {
         next(err);

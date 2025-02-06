@@ -68,13 +68,17 @@ class TokenService {
           secret = envConfig.ACTION_VERIFY_EMAIL_SECRET;
           break;
         default:
-          throw new ApiError("Invalid token type", 401);
+          throw new Error("Invalid token type");
       }
 
       return jwt.verify(token, secret) as ITokenPayload;
     } catch (err) {
-      console.error(err.message);
-      throw new ApiError("Invalid token", 401);
+      throw new ApiError(
+        err.message.includes("Invalid token type")
+          ? err.message
+          : "Invalid or expired token",
+        401,
+      );
     }
   }
 }

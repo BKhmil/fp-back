@@ -54,10 +54,12 @@ router.put(
   authController.changePassword,
 );
 
-router.put(
+router.post(
   "/verify-email",
   authMiddleware.checkActionToken(ActionTokenTypeEnum.VERIFY_EMAIL),
   authController.verify,
 );
+
+// TODO: resend-verification endpoint
 
 export const authRouter = router;

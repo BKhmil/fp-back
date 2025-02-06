@@ -99,9 +99,8 @@ class AuthController {
 
   public async verify(req: Request, res: Response, next: NextFunction) {
     try {
-      const jwtPayload = req.res.locals.accessTokenPayload as ITokenPayload;
-
-      await authService.verify(jwtPayload);
+      const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
+      await authService.verify(tokenPayload);
       res.sendStatus(204);
     } catch (e) {
       next(e);

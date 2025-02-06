@@ -8,6 +8,7 @@ export interface IUser {
   isVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
+  deletedAt: Date;
 }
 
 export type ISignUpDto = Pick<IUser, "name" | "email" | "age" | "password">;

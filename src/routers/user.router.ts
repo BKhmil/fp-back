@@ -10,12 +10,16 @@ const router = Router();
 router.get("/", userController.getList);
 
 router.get("/me", authMiddleware.checkAccessToken, userController.getMe);
-router.put(
+
+router.patch(
   "/me",
   authMiddleware.checkAccessToken,
+  commonMiddleware.isBodyEmpty,
   commonMiddleware.validateBody(UserValidator.updateMe),
   userController.updateMe,
 );
+
+// soft delete
 router.delete("/me", authMiddleware.checkAccessToken, userController.deleteMe);
 
 router.get(

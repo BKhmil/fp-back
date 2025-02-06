@@ -16,6 +16,8 @@ export class UserValidator {
   });
 
   public static updateMe = joi.object({
+    // only these fields are allowed for updating
+    // a special endpoint is required for changing the email
     name: this.name,
     age: this.age,
   });

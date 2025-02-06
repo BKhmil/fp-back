@@ -22,8 +22,11 @@ class UserRepository {
     return await User.findByIdAndUpdate(userId, dto, { new: true });
   }
 
-  public async deleteById(userId: string): Promise<void> {
-    await User.deleteOne({ _id: userId });
+  public async softDeleteById(userId: string): Promise<void> {
+    await User.findByIdAndUpdate(userId, {
+      isDeleted: true,
+      deletedAt: new Date(),
+    });
   }
 }
 

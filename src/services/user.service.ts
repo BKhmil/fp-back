@@ -32,7 +32,7 @@ class UserService {
     if (!user) {
       throw new ApiError("User not found", 404);
     }
-    await userRepository.deleteById(tokenPayload.userId);
+    await userRepository.softDeleteById(tokenPayload.userId);
   }
 
   public async getUserById(userId: string): Promise<IUser> {
