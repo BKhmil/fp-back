@@ -7,6 +7,7 @@ import {
   IForgotPasswordSetDto,
   ISignInDto,
   ISignUpDto,
+  IUser,
 } from "../interfaces/user.interface";
 import { authService } from "../services/auth.service";
 
@@ -88,7 +89,8 @@ class AuthController {
   ) {
     try {
       const dto = req.body as IForgotPasswordSetDto;
-      await authService.forgotPasswordSet(dto);
+      const user = req.res.locals.user as IUser;
+      await authService.forgotPasswordSet(dto, user);
       res.sendStatus(201);
     } catch (e) {
       next(e);
@@ -108,9 +110,9 @@ class AuthController {
 
   public async changePassword(req: Request, res: Response, next: NextFunction) {
     try {
-      const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
       const dto = req.body as IChangePasswordDto;
-      await authService.changePassword(dto, tokenPayload);
+      const user = req.res.locals.user as IUser;
+      await authService.changePassword(dto, user);
       res.sendStatus(204);
     } catch (e) {
       next(e);

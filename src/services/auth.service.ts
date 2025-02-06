@@ -111,7 +111,9 @@ class AuthService {
 
   public async forgotPassword(dto: IForgotPasswordDto): Promise<void> {
     const user = await userRepository.getByEmail(dto.email);
-    if (!user) return;
+    if (!user) {
+      throw new ApiError("Invalid email", 404);
+    }
 
     const token = tokenService.generateActionToken(
       { userId: user._id, name: user.name },
@@ -128,36 +130,20 @@ class AuthService {
     });
   }
 
-  public async forgotPasswordSet(dto: IForgotPasswordSetDto): Promise<void> {
-    const payload = tokenService.verifyToken(
-      dto.token,
-      ActionTokenTypeEnum.FORGOT_PASSWORD,
-    );
-    const entity = await actionTokenRepository.findOneByParams({
-      token: dto.token,
-    });
-    if (!entity) {
-      throw new ApiError("Invalid token", 401);
-    }
-
-    const user = await userRepository.getById(payload.userId);
-
-    // await this.isNewPasswordNewOrThrow(
-    //   dto.password,
-    //   user.password,
-    //   payload.userId,
-    // );
-
+  public async forgotPasswordSet(
+    dto: IForgotPasswordSetDto,
+    user: IUser,
+  ): Promise<void> {
     await oldPasswordRepository.create({
       password: user.password,
-      _userId: payload.userId,
+      _userId: user._id,
     });
 
     const password = await passwordService.hashPassword(dto.password);
-    await userRepository.updateById(payload.userId, { password });
+    await userRepository.updateById(user._id, { password });
 
     await actionTokenRepository.deleteOneByParams({ token: dto.token });
-    await tokenRepository.deleteAllByParams({ _userId: payload.userId });
+    await tokenRepository.deleteAllByParams({ _userId: user._id });
   }
 
   public async verify(payload: ITokenPayload): Promise<void> {
@@ -170,57 +156,17 @@ class AuthService {
 
   public async changePassword(
     dto: IChangePasswordDto,
-    tokenPayload: ITokenPayload,
+    user: IUser,
   ): Promise<void> {
-    const user = await userRepository.getById(tokenPayload.userId);
-    const isPasswordCorrect = await passwordService.comparePassword(
-      dto.oldPassword,
-      user.password,
-    );
-    if (!isPasswordCorrect) {
-      throw new ApiError("Incorrect password", 401);
-    }
-
-    // await this.isNewPasswordNewOrThrow(
-    //   dto.newPassword,
-    //   user.password,
-    //   tokenPayload.userId,
-    // );
-
     await oldPasswordRepository.create({
       password: user.password,
-      _userId: tokenPayload.userId,
+      _userId: user._id,
     });
 
     const password = await passwordService.hashPassword(dto.newPassword);
-    await userRepository.updateById(tokenPayload.userId, { password });
-    await tokenRepository.deleteAllByParams({ _userId: tokenPayload.userId });
+    await userRepository.updateById(user._id, { password });
+    await tokenRepository.deleteAllByParams({ _userId: user._id });
   }
-
-  // private async isNewPasswordNewOrThrow(
-  //   newPassword: string,
-  //   oldHashedPassword: string,
-  //   userId: string,
-  // ): Promise<void> {
-  //   const isNewPasswordSameAsACurrent = await passwordService.comparePassword(
-  //     newPassword,
-  //     oldHashedPassword,
-  //   );
-  //   if (isNewPasswordSameAsACurrent) {
-  //     throw new ApiError("You can not set the old password", 401);
-  //   }
-  //
-  //   const docs = await oldPasswordRepository.getMany(userId);
-  //   for (const doc of docs) {
-  //     const isSame = await passwordService.comparePassword(
-  //       newPassword,
-  //       doc.password,
-  //     );
-  //     if (isSame) {
-  //       throw new ApiError("You can not set the old password", 401);
-  //     }
-  //   }
-  // }
 }
 
 export const authService = new AuthService();

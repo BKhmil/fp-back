@@ -39,13 +39,18 @@ router.post(
   commonMiddleware.validateBody(UserValidator.forgotPassword),
   authController.forgotPassword,
 );
-router.put("/forgot-password", authController.forgotPasswordSet);
+router.put(
+  "/forgot-password",
+  authMiddleware.checkActionToken(ActionTokenTypeEnum.FORGOT_PASSWORD),
+  authMiddleware.checkNewPasswordIsUnique(),
+  authController.forgotPasswordSet,
+);
 
 router.put(
   "/change-password",
   commonMiddleware.validateBody(UserValidator.changePassword),
   authMiddleware.checkAccessToken,
-  authMiddleware.checkNewPasswordIsUnique,
+  authMiddleware.checkNewPasswordIsUnique(true),
   authController.changePassword,
 );
 
