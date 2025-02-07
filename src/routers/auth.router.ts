@@ -22,9 +22,15 @@ router.post(
 );
 
 router.post(
-  "/refresh",
-  authMiddleware.checkRefreshToken,
-  authController.refresh,
+  "/account-restore",
+  commonMiddleware.validateBody(UserValidator.accountRestore),
+  authController.accountRestore,
+);
+router.put(
+  "/account-restore",
+  authMiddleware.checkActionToken(ActionTokenTypeEnum.ACCOUNT_RESTORE),
+  // at this point user can set the old one password
+  authController.accountRestoreSet,
 );
 
 router.post("/logout", authMiddleware.checkAccessToken, authController.logout);
@@ -32,6 +38,12 @@ router.post(
   "/logout-all",
   authMiddleware.checkAccessToken,
   authController.logoutAll,
+);
+
+router.post(
+  "/refresh",
+  authMiddleware.checkRefreshToken,
+  authController.refresh,
 );
 
 router.post(

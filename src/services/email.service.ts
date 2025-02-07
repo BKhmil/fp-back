@@ -5,6 +5,7 @@ import React from "react";
 import { envConfig } from "../configs/env.config";
 import { EmailTypeEnum } from "../enums/email-type.enum";
 import { ApiError } from "../errors/api.error";
+import { AccountRestoreEmail } from "../templates/AccountRestore";
 import { ForgotPasswordEmail } from "../templates/ForgotPassword";
 import { LogoutEmail } from "../templates/Logout";
 import { OldVisitEmail } from "../templates/OldVisit";
@@ -59,6 +60,14 @@ class EmailService {
             React.createElement(OldVisitEmail, {
               context:
                 context as EmailTypeToPayloadType[EmailTypeEnum.OLD_VISIT],
+            }),
+          );
+          break;
+        case EmailTypeEnum.ACCOUNT_RESTORE:
+          emailHtml = await render(
+            React.createElement(AccountRestoreEmail, {
+              context:
+                context as EmailTypeToPayloadType[EmailTypeEnum.ACCOUNT_RESTORE],
             }),
           );
           break;

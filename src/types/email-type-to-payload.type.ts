@@ -19,4 +19,8 @@ export type EmailTypeToPayloadType = {
     EmailCombinedPayloadType,
     "frontUrl" | "name"
   >;
+  [EmailTypeEnum.ACCOUNT_RESTORE]: PickRequired<
+    EmailCombinedPayloadType,
+    "frontUrl" | "actionToken"
+  >;
 };

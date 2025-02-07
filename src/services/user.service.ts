@@ -1,6 +1,8 @@
 import { ApiError } from "../errors/api.error";
 import { ITokenPayload } from "../interfaces/token.interface";
 import { IUser, IUserUpdateDto } from "../interfaces/user.interface";
+import { actionTokenRepository } from "../repositories/action-token.repository";
+import { tokenRepository } from "../repositories/token.repository";
 import { userRepository } from "../repositories/user.repository";
 
 class UserService {
@@ -32,7 +34,12 @@ class UserService {
     if (!user) {
       throw new ApiError("User not found", 404);
     }
+
     await userRepository.softDeleteById(tokenPayload.userId);
+    await tokenRepository.deleteAllSignsByUserId(tokenPayload.userId);
+    await actionTokenRepository.deleteManyByParams({
+      _userId: tokenPayload.userId,
+    });
   }
 
   public async getUserById(userId: string): Promise<IUser> {

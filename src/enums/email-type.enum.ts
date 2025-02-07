@@ -3,4 +3,5 @@ export enum EmailTypeEnum {
   OLD_VISIT = "OLD_VISIT",
   WELCOME = "WELCOME",
   LOGOUT = "LOGOUT",
+  ACCOUNT_RESTORE = "ACCOUNT_RESTORE",
 }

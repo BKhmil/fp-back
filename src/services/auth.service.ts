@@ -4,6 +4,8 @@ import { EmailTypeEnum } from "../enums/email-type.enum";
 import { ApiError } from "../errors/api.error";
 import { ITokenPair, ITokenPayload } from "../interfaces/token.interface";
 import {
+  IAccountRestoreDto,
+  IAccountRestoreSetDto,
   IChangePasswordDto,
   IForgotPasswordDto,
   IForgotPasswordSetDto,
@@ -166,6 +168,43 @@ class AuthService {
     const password = await passwordService.hashPassword(dto.newPassword);
     await userRepository.updateById(user._id, { password });
     await tokenRepository.deleteAllByParams({ _userId: user._id });
+  }
+
+  public async accountRestore(dto: IAccountRestoreDto): Promise<void> {
+    const user = await userRepository.getByEmail(dto.email);
+    if (!user) {
+      throw new ApiError("Invalid email", 404);
+    }
+
+    const token = tokenService.generateActionToken(
+      { userId: user._id, name: user.name },
+      ActionTokenTypeEnum.ACCOUNT_RESTORE,
+    );
+    await actionTokenRepository.create({
+      type: ActionTokenTypeEnum.ACCOUNT_RESTORE,
+      _userId: user._id,
+      token,
+    });
+    await emailService.sendEmail(EmailTypeEnum.ACCOUNT_RESTORE, dto.email, {
+      frontUrl: envConfig.APP_FRONT_URL,
+      actionToken: token,
+    });
+  }
+
+  public async accountRestoreSet(
+    dto: IAccountRestoreSetDto,
+    payload: ITokenPayload,
+  ): Promise<void> {
+    await oldPasswordRepository.deleteManyByUserId(payload.userId);
+
+    const password = await passwordService.hashPassword(dto.password);
+    await userRepository.updateById(payload.userId, {
+      password,
+      isDeleted: false,
+    });
+
+    await actionTokenRepository.deleteOneByParams({ token: dto.token });
+    await tokenRepository.deleteAllByParams({ _userId: payload.userId });
   }
 }
 

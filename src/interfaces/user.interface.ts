@@ -20,6 +20,9 @@ export type ISignInDto = Pick<IUser, "email" | "password">;
 export type IForgotPasswordDto = Pick<IUser, "email">;
 export type IForgotPasswordSetDto = Pick<IUser, "password"> & { token: string };
 
+export type IAccountRestoreDto = Pick<IUser, "email">;
+export type IAccountRestoreSetDto = Pick<IUser, "password"> & { token: string };
+
 export type IChangePasswordDto = {
   oldPassword: string;
   newPassword: string;

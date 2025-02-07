@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 
+import { ApiError } from "../errors/api.error";
 import { ITokenPayload } from "../interfaces/token.interface";
 import {
+  IAccountRestoreDto,
+  IAccountRestoreSetDto,
   IChangePasswordDto,
   IForgotPasswordDto,
   IForgotPasswordSetDto,
@@ -14,21 +17,34 @@ import { authService } from "../services/auth.service";
 class AuthController {
   public async signUp(req: Request, res: Response, next: NextFunction) {
     try {
-      const dto = req.body as ISignUpDto;
-      const result = await authService.signUp(dto);
-      res.status(201).json(result);
-    } catch (e) {
-      next(e);
+      const isDeleted = req.res.locals.isDeleted as boolean;
+
+      if (isDeleted) {
+        // for restoring account -  POST: /api/auth/restore-account
+        res.json({ canRestore: true });
+      } else {
+        const dto = req.body as ISignUpDto;
+        const result = await authService.signUp(dto);
+        res.status(201).json(result);
+      }
+    } catch (err) {
+      next(err);
     }
   }
 
   public async signIn(req: Request, res: Response, next: NextFunction) {
     try {
-      const dto = req.body as ISignInDto;
-      const result = await authService.signIn(dto);
-      res.status(201).json(result);
-    } catch (e) {
-      next(e);
+      const isDeleted = req.res.locals.isDeleted as boolean;
+
+      if (isDeleted) {
+        throw new ApiError("User not found", 401);
+      } else {
+        const dto = req.body as ISignInDto;
+        const result = await authService.signIn(dto);
+        res.status(201).json(result);
+      }
+    } catch (err) {
+      next(err);
     }
   }
 
@@ -38,8 +54,8 @@ class AuthController {
       const refreshToken = req.res.locals.refreshToken as string;
       const result = await authService.refresh(tokenPayload, refreshToken);
       res.status(201).json(result);
-    } catch (e) {
-      next(e);
+    } catch (err) {
+      next(err);
     }
   }
 
@@ -53,8 +69,8 @@ class AuthController {
       const accessToken = req.res.locals.accessToken as string;
       await authService.logout(accessToken, tokenPayload);
       res.sendStatus(204);
-    } catch (e) {
-      next(e);
+    } catch (err) {
+      next(err);
     }
   }
 
@@ -67,8 +83,8 @@ class AuthController {
       const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
       await authService.logoutAll(tokenPayload);
       res.sendStatus(204);
-    } catch (e) {
-      next(e);
+    } catch (err) {
+      next(err);
     }
   }
 
@@ -77,8 +93,8 @@ class AuthController {
       const dto = req.body as IForgotPasswordDto;
       await authService.forgotPassword(dto);
       res.sendStatus(201);
-    } catch (e) {
-      next(e);
+    } catch (err) {
+      next(err);
     }
   }
 
@@ -92,8 +108,8 @@ class AuthController {
       const user = req.res.locals.user as IUser;
       await authService.forgotPasswordSet(dto, user);
       res.sendStatus(201);
-    } catch (e) {
-      next(e);
+    } catch (err) {
+      next(err);
     }
   }
 
@@ -102,8 +118,8 @@ class AuthController {
       const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
       await authService.verify(tokenPayload);
       res.sendStatus(204);
-    } catch (e) {
-      next(e);
+    } catch (err) {
+      next(err);
     }
   }
 
@@ -113,8 +129,33 @@ class AuthController {
       const user = req.res.locals.user as IUser;
       await authService.changePassword(dto, user);
       res.sendStatus(204);
-    } catch (e) {
-      next(e);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  public async accountRestore(req: Request, res: Response, next: NextFunction) {
+    try {
+      const dto = req.body as IAccountRestoreDto;
+      await authService.accountRestore(dto);
+      res.sendStatus(204);
+    } catch (err) {
+      next(err);
+    }
+  }
+
+  public async accountRestoreSet(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const dto = req.body as IAccountRestoreSetDto;
+      const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
+      await authService.accountRestoreSet(dto, tokenPayload);
+      res.sendStatus(201);
+    } catch (err) {
+      next(err);
     }
   }
 }

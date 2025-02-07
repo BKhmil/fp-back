@@ -39,6 +39,10 @@ class TokenService {
         secret = envConfig.ACTION_VERIFY_EMAIL_SECRET;
         expiresIn = envConfig.ACTION_VERIFY_EMAIL_EXPIRATION;
         break;
+      case ActionTokenTypeEnum.ACCOUNT_RESTORE:
+        secret = envConfig.ACTION_ACCOUNT_RESTORE_SECRET;
+        expiresIn = envConfig.ACTION_ACCOUNT_RESTORE_EXPIRATION;
+        break;
       default:
         throw new ApiError("Invalid action token type", 500);
     }
@@ -66,6 +70,9 @@ class TokenService {
           break;
         case ActionTokenTypeEnum.VERIFY_EMAIL:
           secret = envConfig.ACTION_VERIFY_EMAIL_SECRET;
+          break;
+        case ActionTokenTypeEnum.ACCOUNT_RESTORE:
+          secret = envConfig.ACTION_ACCOUNT_RESTORE_SECRET;
           break;
         default:
           throw new Error("Invalid token type");

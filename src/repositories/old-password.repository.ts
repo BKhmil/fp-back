@@ -14,6 +14,10 @@ class OldPasswordRepository {
     return await OldPassword.deleteMany({ password });
   }
 
+  public async deleteManyByUserId(userId: string) {
+    return await OldPassword.deleteMany({ _userId: userId });
+  }
+
   public async deleteBeforeDate(date: Date): Promise<number> {
     const { deletedCount } = await OldPassword.deleteMany({
       createdAt: { $lt: date },

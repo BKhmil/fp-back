@@ -106,6 +106,13 @@ class AuthMiddleware {
       try {
         const dto = req.body as ISignUpDto | ISignInDto;
         const user = await userRepository.getByEmail(dto.email);
+
+        // if user forgot he had account before
+        if (user && user.isDeleted) {
+          req.res.locals.isDeleted = true;
+          return next();
+        }
+
         if (user && isSafe) {
           throw new ApiError("Email is already in use", 409);
         }
