@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
+import { SUCCESS_CODES } from "../constants/success-codes.constant";
 import { ITokenPayload } from "../interfaces/token.interface";
 import {
   IUserListQuery,
@@ -22,7 +23,7 @@ class UserController {
     try {
       const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
       const result = await userService.getMe(tokenPayload);
-      res.status(200).json(result);
+      res.json(result);
     } catch (err) {
       next(err);
     }
@@ -33,7 +34,7 @@ class UserController {
       const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
       const dto = req.body as IUserUpdateRequestDto;
       const result = await userService.updateMe(tokenPayload, dto);
-      res.status(201).json(result);
+      res.json(result);
     } catch (err) {
       next(err);
     }
@@ -43,7 +44,7 @@ class UserController {
     try {
       const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
       await userService.deleteMe(tokenPayload);
-      res.sendStatus(204);
+      res.sendStatus(SUCCESS_CODES.NO_CONTENT);
     } catch (err) {
       next(err);
     }

@@ -41,4 +41,11 @@ app.listen(envConfig.APP_PORT, async () => {
       ":" +
       envConfig.APP_PORT,
   );
+  console.log(
+    "Server is available on http://" +
+      envConfig.APP_HOST +
+      ":" +
+      envConfig.APP_PORT +
+      "/docs",
+  );
 });
