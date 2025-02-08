@@ -1,16 +1,17 @@
 import { NextFunction, Request, Response } from "express";
 
 import { ITokenPayload } from "../interfaces/token.interface";
-import { IUserUpdateDto } from "../interfaces/user.interface";
+import { IUserListQuery, IUserUpdateDto } from "../interfaces/user.interface";
 import { userService } from "../services/user.service";
 
 class UserController {
   public async getList(req: Request, res: Response, next: NextFunction) {
     try {
-      const result = await userService.getList();
+      const query = req.query as unknown as IUserListQuery;
+      const result = await userService.getList(query);
       res.json(result);
-    } catch (e) {
-      next(e);
+    } catch (err) {
+      next(err);
     }
   }
 
@@ -19,8 +20,8 @@ class UserController {
       const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
       const result = await userService.getMe(tokenPayload);
       res.status(200).json(result);
-    } catch (e) {
-      next(e);
+    } catch (err) {
+      next(err);
     }
   }
 
@@ -30,8 +31,8 @@ class UserController {
       const dto = req.body as IUserUpdateDto;
       const result = await userService.updateMe(tokenPayload, dto);
       res.status(201).json(result);
-    } catch (e) {
-      next(e);
+    } catch (err) {
+      next(err);
     }
   }
 
@@ -40,8 +41,8 @@ class UserController {
       const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
       await userService.deleteMe(tokenPayload);
       res.sendStatus(204);
-    } catch (e) {
-      next(e);
+    } catch (err) {
+      next(err);
     }
   }
 
@@ -50,8 +51,8 @@ class UserController {
       const userId = req.params.userId;
       const result = await userService.getUserById(userId);
       res.status(200).json(result);
-    } catch (e) {
-      next(e);
+    } catch (err) {
+      next(err);
     }
   }
 }

@@ -1,13 +1,20 @@
 import { ApiError } from "../errors/api.error";
 import { ITokenPayload } from "../interfaces/token.interface";
-import { IUser, IUserUpdateDto } from "../interfaces/user.interface";
+import {
+  IUser,
+  IUserListQuery,
+  IUserListResponse,
+  IUserUpdateDto,
+} from "../interfaces/user.interface";
+import { userPresenter } from "../presenters/user.presenter";
 import { actionTokenRepository } from "../repositories/action-token.repository";
 import { tokenRepository } from "../repositories/token.repository";
 import { userRepository } from "../repositories/user.repository";
 
 class UserService {
-  public async getList(): Promise<IUser[]> {
-    return await userRepository.getList();
+  public async getList(query: IUserListQuery): Promise<IUserListResponse> {
+    const { entities, total } = await userRepository.getList(query);
+    return userPresenter.toResponseList(entities, total, query);
   }
 
   public async getMe(tokenPayload: ITokenPayload): Promise<IUser> {
@@ -44,7 +51,7 @@ class UserService {
 
   public async getUserById(userId: string): Promise<IUser> {
     const user = await userRepository.getById(userId);
-    if (!user) {
+    if (!user || user.isDeleted) {
       throw new ApiError("User not found", 404);
     }
     return user;

@@ -12,8 +12,8 @@ const handler = async () => {
     const date = timeHelper.subtractCurrentByParams(value, unit);
     const deletedCount = await oldPasswordRepository.deleteBeforeDate(date);
     console.log("Deleted " + deletedCount + " old passwords");
-  } catch (e) {
-    console.error(e);
+  } catch (err) {
+    console.error(err);
   }
 };
 

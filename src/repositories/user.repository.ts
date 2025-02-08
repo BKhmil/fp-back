@@ -1,9 +1,43 @@
-import { ISignUpDto, IUser } from "../interfaces/user.interface";
+import { FilterQuery } from "mongoose";
+
+import {
+  ISignUpDto,
+  IUser,
+  IUserListQuery,
+} from "../interfaces/user.interface";
 import { User } from "../models/user.model";
 
 class UserRepository {
-  public async getList(): Promise<IUser[]> {
-    return await User.find({ isDeleted: false });
+  public async getList(
+    query: IUserListQuery,
+  ): Promise<{ entities: IUser[]; total: number }> {
+    const filterObj: FilterQuery<IUser> = { isDeleted: false };
+
+    if (query.name) {
+      filterObj.name = { $regex: query.name, $options: "i" };
+    }
+
+    if (query.age) {
+      filterObj.age = query.age;
+    } else {
+      if (query.minAge && query.maxAge) {
+        filterObj.age = { $gte: query.minAge, $lte: query.maxAge };
+      } else if (query.minAge) {
+        filterObj.age = { $gte: query.minAge };
+      } else if (query.maxAge) {
+        filterObj.age = { $lte: query.maxAge };
+      }
+    }
+
+    const skip = query.limit * (query.page - 1);
+
+    const sortObj = { [query.orderBy]: query.order };
+
+    const [entities, total] = await Promise.all([
+      User.find(filterObj).sort(sortObj).limit(query.limit).skip(skip),
+      User.countDocuments(filterObj),
+    ]);
+    return { entities, total };
   }
 
   public async create(dto: ISignUpDto): Promise<IUser> {

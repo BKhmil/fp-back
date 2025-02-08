@@ -13,8 +13,8 @@ const handler = async () => {
 
     const count = await tokenRepository.deleteBeforeDate(date);
     console.log(`Deleted ${count} old tokens`);
-  } catch (e) {
-    console.error(e.message);
+  } catch (err) {
+    console.error(err.message);
   }
 };
 

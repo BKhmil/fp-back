@@ -7,9 +7,22 @@ import { UserValidator } from "../validators/user.validator";
 
 const router = Router();
 
-router.get("/", authMiddleware.checkAccessToken, userController.getList);
+router.get(
+  "/",
+  authMiddleware.checkAccessToken,
+  commonMiddleware.validateQuery(UserValidator.getListQuery),
+  userController.getList,
+);
 
 router.get("/me", authMiddleware.checkAccessToken, userController.getMe);
+
+// Stage_1, task_4: search by userId OR email -> [ userId ]
+router.get(
+  "/:userId",
+  authMiddleware.checkAccessToken,
+  commonMiddleware.isIdValid("userId"),
+  userController.getUserById,
+);
 
 router.patch(
   "/me",
@@ -21,11 +34,5 @@ router.patch(
 
 // soft delete
 router.delete("/me", authMiddleware.checkAccessToken, userController.deleteMe);
-
-router.get(
-  "/:userId",
-  commonMiddleware.isIdValid("userId"),
-  userController.getUserById,
-);
 
 export const userRouter = router;

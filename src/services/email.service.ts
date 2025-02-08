@@ -94,6 +94,7 @@ class EmailService {
       [EmailTypeEnum.FORGOT_PASSWORD]: "Reset Your Password",
       [EmailTypeEnum.OLD_VISIT]: "We Miss You!",
       [EmailTypeEnum.LOGOUT]: "You've Logged Out",
+      [EmailTypeEnum.ACCOUNT_RESTORE]: "Restore your account",
     };
     return subjects[type] || "Notification";
   }

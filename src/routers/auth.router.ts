@@ -68,6 +68,7 @@ router.put(
 
 router.post(
   "/verify-email",
+  // TODO: validate req.body.token
   authMiddleware.checkActionToken(ActionTokenTypeEnum.VERIFY_EMAIL),
   authController.verify,
 );

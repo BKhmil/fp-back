@@ -13,15 +13,12 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api", apiRouter);
 
-app.use(
-  "*",
-  (error: ApiError, req: Request, res: Response, next: NextFunction) => {
-    const status = error.statusCode || 500;
-    const message = error.message ?? "Something went wrong";
+app.use((error: ApiError, req: Request, res: Response, next: NextFunction) => {
+  const status = error.statusCode || 500;
+  const message = error.message ?? "Something went wrong";
 
-    res.status(status).json({ status, message });
-  },
-);
+  res.status(status).json({ status, message });
+});
 
 process.on("uncaughtException", (error) => {
   console.error("Uncaught Exception: ", error);
