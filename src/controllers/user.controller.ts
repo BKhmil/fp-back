@@ -1,7 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 
 import { ITokenPayload } from "../interfaces/token.interface";
-import { IUserListQuery, IUserUpdateDto } from "../interfaces/user.interface";
+import {
+  IUserListQuery,
+  IUserUpdateRequestDto,
+} from "../interfaces/user.interface";
 import { userService } from "../services/user.service";
 
 class UserController {
@@ -28,7 +31,7 @@ class UserController {
   public async updateMe(req: Request, res: Response, next: NextFunction) {
     try {
       const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
-      const dto = req.body as IUserUpdateDto;
+      const dto = req.body as IUserUpdateRequestDto;
       const result = await userService.updateMe(tokenPayload, dto);
       res.status(201).json(result);
     } catch (err) {
@@ -50,7 +53,7 @@ class UserController {
     try {
       const userId = req.params.userId;
       const result = await userService.getUserById(userId);
-      res.status(200).json(result);
+      res.json(result);
     } catch (err) {
       next(err);
     }

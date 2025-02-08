@@ -14,6 +14,24 @@ router.get(
   userController.getList,
 );
 
+/**
+ * @swagger
+ * /users/me:
+ *   get:
+ *     summary: Get current user
+ *     tags: [Users]
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: User data
+ *       401:
+ *         description: Unauthorized
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Unexpected error (user not found after authentication)
+ */
 router.get("/me", authMiddleware.checkAccessToken, userController.getMe);
 
 // Stage_1, task_4: search by userId OR email -> [ userId ]

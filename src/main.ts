@@ -1,7 +1,9 @@
 import express, { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
+import swaggerUi from "swagger-ui-express";
 
 import { envConfig } from "./configs/env.config";
+import { swaggerDocs } from "./configs/swagger.config";
 import { cronRunner } from "./crons";
 import { ApiError } from "./errors/api.error";
 import { apiRouter } from "./routers/api.router";
@@ -11,14 +13,19 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use("/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 app.use("/api", apiRouter);
 
-app.use((error: ApiError, req: Request, res: Response, next: NextFunction) => {
-  const status = error.statusCode || 500;
-  const message = error.message ?? "Something went wrong";
+app.use(
+  "*",
+  (error: ApiError, req: Request, res: Response, next: NextFunction) => {
+    const status = error.statusCode || 500;
+    const message = error.message ?? "Something went wrong";
 
-  res.status(status).json({ status, message });
-});
+    res.status(status).json({ status, message });
+  },
+);
 
 process.on("uncaughtException", (error) => {
   console.error("Uncaught Exception: ", error);

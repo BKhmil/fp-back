@@ -1,7 +1,7 @@
 import { FilterQuery } from "mongoose";
 
 import {
-  ISignUpDto,
+  ISignUpRequestDto,
   IUser,
   IUserListQuery,
 } from "../interfaces/user.interface";
@@ -40,7 +40,7 @@ class UserRepository {
     return { entities, total };
   }
 
-  public async create(dto: ISignUpDto): Promise<IUser> {
+  public async create(dto: ISignUpRequestDto): Promise<IUser> {
     return await User.create(dto);
   }
 

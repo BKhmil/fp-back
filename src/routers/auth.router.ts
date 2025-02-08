@@ -54,7 +54,6 @@ router.post(
 router.put(
   "/forgot-password",
   authMiddleware.checkActionToken(ActionTokenTypeEnum.FORGOT_PASSWORD),
-  authMiddleware.checkNewPasswordIsUnique(),
   authController.forgotPasswordSet,
 );
 
@@ -62,7 +61,6 @@ router.put(
   "/change-password",
   commonMiddleware.validateBody(UserValidator.changePassword),
   authMiddleware.checkAccessToken,
-  authMiddleware.checkNewPasswordIsUnique(true),
   authController.changePassword,
 );
 

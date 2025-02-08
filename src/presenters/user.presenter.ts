@@ -1,13 +1,13 @@
 import {
   IUser,
   IUserListQuery,
-  IUserListResponse,
-  IUserResponse,
-  IUserShortResponse,
+  IUserListResponseDto,
+  IUserResponseDto,
+  IUserShortResponseDto,
 } from "../interfaces/user.interface";
 
 class UserPresenter {
-  public toResponse(entity: IUser): IUserResponse {
+  public toResponse(entity: IUser): IUserResponseDto {
     return {
       _id: entity._id,
       name: entity.name,
@@ -19,7 +19,7 @@ class UserPresenter {
     };
   }
 
-  public toShortResponse(entity: IUser): IUserShortResponse {
+  public toShortResponse(entity: IUser): IUserShortResponseDto {
     return {
       _id: entity._id,
       age: entity.age,
@@ -32,7 +32,7 @@ class UserPresenter {
     entities: IUser[],
     total: number,
     query: IUserListQuery,
-  ): IUserListResponse {
+  ): IUserListResponseDto {
     return {
       data: entities.map(this.toShortResponse),
       total,
