@@ -138,10 +138,11 @@ const router = Router();
  *                   enum:
  *                     - "\"page\" must be greater than or equal to 1"
  *                     - "\"limit\" must be between 1 and 100"
+ *                     - "\"age\" must be greater than or equal to 18"
+ *                     - "\"age\" must be less than or equal to 200"
  *                     - "\"name\" must be a string"
- *                     - "\"name\" length must be between 1 and 50 characters"
  *                     - "\"age\" must be a number"
- *                     - "\"age\" must be between 18 and 200"
+ *                     - "\"name\" length must be less than or equal to 50 characters long"
  *                     - "\"minAge\" must be a number"
  *                     - "\"minAge\" must be between 18 and 200"
  *                     - "\"maxAge\" must be a number"
@@ -359,6 +360,7 @@ router.get(
  *                     - "\"name\" must be a string"
  *                     - "\"age\" must be a number"
  *                     - "\"name\" length must be less than or equal to 50 characters long"
+ *                     - "Expected double-quoted property name in JSON at position 37"
  *                   example: "Request body cannot be empty"
  *       401:
  *         description: Unauthorized

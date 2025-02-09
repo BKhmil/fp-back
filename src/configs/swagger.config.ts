@@ -11,6 +11,9 @@ const swaggerOptions: swaggerJsdoc.Options = {
       title: "User_posts API",
       version: "1.0.0",
       description: "API documentation",
+      contact: {
+        email: "khmil.work@gmail.com",
+      },
     },
     servers: [
       { url: "http://" + envConfig.APP_HOST + ":" + envConfig.APP_PORT },
@@ -106,6 +109,32 @@ const swaggerOptions: swaggerJsdoc.Options = {
               type: "string",
               format: "date-time",
               example: "2024-02-05T15:30:00.000Z",
+            },
+          },
+        },
+        TokenPair: {
+          type: "object",
+          properties: {
+            accessToken: {
+              type: "string",
+              example:
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            },
+            refreshToken: {
+              type: "string",
+              example:
+                "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+            },
+          },
+        },
+        SignInResponse: {
+          type: "object",
+          properties: {
+            user: {
+              $ref: "#/components/schemas/UserResponse",
+            },
+            tokens: {
+              $ref: "#/components/schemas/TokenPair",
             },
           },
         },
