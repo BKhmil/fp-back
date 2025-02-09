@@ -121,6 +121,7 @@ class AuthMiddleware {
     };
   }
 
+  // I had to make it a private method in the AuthService...
   public checkEmail(isSafe: boolean = false) {
     return async (req: Request, res: Response, next: NextFunction) => {
       try {

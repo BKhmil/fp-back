@@ -39,6 +39,7 @@ class AuthService {
       { userId: user._id, name: user.name },
       ActionTokenTypeEnum.VERIFY_EMAIL,
     );
+    // accessToken stored in DB, just no time for Redis-based implementation
     await actionTokenRepository.create({
       token,
       type: ActionTokenTypeEnum.VERIFY_EMAIL,

@@ -25,6 +25,11 @@ class ActionTokenRepository {
   ): Promise<void> {
     await ActionToken.deleteMany(params);
   }
+
+  public async deleteBeforeDate(date: Date): Promise<number> {
+    const result = await ActionToken.deleteMany({ createdAt: { $lt: date } });
+    return result.deletedCount;
+  }
 }
 
 export const actionTokenRepository = new ActionTokenRepository();
