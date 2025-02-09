@@ -39,4 +39,16 @@ export const ERRORS = {
     message: "Email is already verified",
     statusCode: 409,
   },
+  USER_NOT_VERIFIED: {
+    message: "User must be verified to perform this action",
+    statusCode: 403,
+  },
+  POST_NOT_FOUND: {
+    message: "Post not found",
+    statusCode: 404,
+  },
+  FORBIDDEN_POST_ACCESS: {
+    message: "You are not allowed to access this post",
+    statusCode: 403,
+  },
 } as const;

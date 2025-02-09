@@ -4,6 +4,7 @@ import { ERRORS } from "../constants/errors.constant";
 import { ActionTokenTypeEnum } from "../enums/action-token-type.enum";
 import { TokenTypeEnum } from "../enums/token-type.enum";
 import { ApiError } from "../errors/api.error";
+import { ITokenPayload } from "../interfaces/token.interface";
 import {
   ISignInRequestDto,
   ISignUpRequestDto,
@@ -119,6 +120,28 @@ class AuthMiddleware {
         next(err);
       }
     };
+  }
+
+  public async checkVerifiedUser(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
+
+      const user = await userRepository.getById(tokenPayload.userId);
+      if (!user.isVerified) {
+        throw new ApiError(
+          ERRORS.USER_NOT_VERIFIED.message,
+          ERRORS.USER_NOT_VERIFIED.statusCode,
+        );
+      }
+
+      next();
+    } catch (err) {
+      next(err);
+    }
   }
 
   // I had to make it a private method in the AuthService...
