@@ -24,7 +24,7 @@ app.use(
     const status = error.statusCode || ERRORS.DEFAULT.statusCode;
     const message = error.message ?? ERRORS.DEFAULT.message;
 
-    res.status(status).json({ status, message });
+    res.status(status).json({ message });
   },
 );
 
