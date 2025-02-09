@@ -66,11 +66,14 @@ router.put(
 
 router.post(
   "/verify-email",
-  // TODO: validate req.body.token
   authMiddleware.checkActionToken(ActionTokenTypeEnum.VERIFY_EMAIL),
   authController.verify,
 );
 
-// TODO: resend-verification endpoint
+router.post(
+  "/resend-verification",
+  authMiddleware.checkAccessToken,
+  authController.resendVerifyEmail,
+);
 
 export const authRouter = router;

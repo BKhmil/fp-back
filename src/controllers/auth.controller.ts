@@ -162,6 +162,20 @@ class AuthController {
       next(err);
     }
   }
+
+  public async resendVerifyEmail(
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ) {
+    try {
+      const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
+      await authService.resendVerifyEmail(tokenPayload);
+      res.sendStatus(SUCCESS_CODES.NO_CONTENT);
+    } catch (err) {
+      next(err);
+    }
+  }
 }
 
 export const authController = new AuthController();

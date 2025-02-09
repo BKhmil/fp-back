@@ -35,4 +35,8 @@ export const ERRORS = {
     message: "Something went wrong",
     statusCode: 500,
   },
+  EMAIL_ALREADY_VERIFIED: {
+    message: "Email is already verified",
+    statusCode: 400,
+  },
 } as const;

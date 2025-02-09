@@ -154,6 +154,42 @@ class AuthService {
     });
   }
 
+  public async resendVerifyEmail(tokenPayload: ITokenPayload): Promise<void> {
+    const user = await userRepository.getById(tokenPayload.userId);
+
+    if (user.isVerified) {
+      throw new ApiError(
+        ERRORS.EMAIL_ALREADY_VERIFIED.message,
+        ERRORS.EMAIL_ALREADY_VERIFIED.statusCode,
+      );
+    }
+
+    await actionTokenRepository.deleteOneByParams({
+      _userId: tokenPayload.userId,
+    });
+
+    const token = tokenService.generateActionToken(
+      { userId: user._id, name: user.name },
+      ActionTokenTypeEnum.VERIFY_EMAIL,
+    );
+
+    await actionTokenRepository.create({
+      token,
+      type: ActionTokenTypeEnum.VERIFY_EMAIL,
+      _userId: user._id,
+    });
+
+    await emailService.sendEmail(
+      EmailTypeEnum.VERIFY_EMAIL_ON_RESEND,
+      user.email,
+      {
+        name: user.name,
+        frontUrl: envConfig.APP_FRONT_URL,
+        actionToken: token,
+      },
+    );
+  }
+
   public async changePassword(
     dto: IChangePasswordRequestDto,
     tokenPayload: ITokenPayload,

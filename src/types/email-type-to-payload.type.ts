@@ -23,4 +23,8 @@ export type EmailTypeToPayloadType = {
     EmailCombinedPayloadType,
     "frontUrl" | "actionToken"
   >;
+  [EmailTypeEnum.VERIFY_EMAIL_ON_RESEND]: PickRequired<
+    EmailCombinedPayloadType,
+    "frontUrl" | "name" | "actionToken"
+  >;
 };

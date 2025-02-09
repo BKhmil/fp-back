@@ -10,6 +10,7 @@ import { AccountRestoreEmail } from "../templates/AccountRestore";
 import { ForgotPasswordEmail } from "../templates/ForgotPassword";
 import { LogoutEmail } from "../templates/Logout";
 import { OldVisitEmail } from "../templates/OldVisit";
+import { VerifyOnResendEmail } from "../templates/VerifyOnResend";
 import { WelcomeEmail } from "../templates/Welcome";
 import { EmailTypeToPayloadType } from "../types/email-type-to-payload.type";
 
@@ -72,6 +73,14 @@ class EmailService {
             }),
           );
           break;
+        case EmailTypeEnum.VERIFY_EMAIL_ON_RESEND:
+          emailHtml = await render(
+            React.createElement(VerifyOnResendEmail, {
+              context:
+                context as EmailTypeToPayloadType[EmailTypeEnum.VERIFY_EMAIL_ON_RESEND],
+            }),
+          );
+          break;
         default:
           throw new ApiError(
             ERRORS.UNKNOWN_EMAIL_TYPE.message,
@@ -100,6 +109,7 @@ class EmailService {
       [EmailTypeEnum.OLD_VISIT]: "We Miss You!",
       [EmailTypeEnum.LOGOUT]: "You've Logged Out",
       [EmailTypeEnum.ACCOUNT_RESTORE]: "Restore your account",
+      [EmailTypeEnum.VERIFY_EMAIL_ON_RESEND]: "Confirm your email",
     };
     return subjects[type] || "Notification";
   }
