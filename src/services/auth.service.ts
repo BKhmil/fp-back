@@ -1,4 +1,5 @@
 import { envConfig } from "../configs/env.config";
+import { ERRORS } from "../constants/errors.constant";
 import { ActionTokenTypeEnum } from "../enums/action-token-type.enum";
 import { EmailTypeEnum } from "../enums/email-type.enum";
 import { ApiError } from "../errors/api.error";
@@ -44,15 +45,11 @@ class AuthService {
       _userId: user._id,
     });
 
-    try {
-      await emailService.sendEmail(EmailTypeEnum.WELCOME, user.email, {
-        name: user.name,
-        frontUrl: envConfig.APP_FRONT_URL,
-        actionToken: token,
-      });
-    } catch (err) {
-      throw new ApiError(err.message, 500);
-    }
+    await emailService.sendEmail(EmailTypeEnum.WELCOME, user.email, {
+      name: user.name,
+      frontUrl: envConfig.APP_FRONT_URL,
+      actionToken: token,
+    });
 
     return { user: userPresenter.toResponse(user), tokens };
   }
@@ -107,7 +104,10 @@ class AuthService {
   public async forgotPassword(dto: IForgotPasswordRequestDto): Promise<void> {
     const user = await userRepository.getByEmail(dto.email);
     if (!user) {
-      throw new ApiError("Invalid email", 404);
+      throw new ApiError(
+        ERRORS.INVALID_CREDENTIALS.message,
+        ERRORS.INVALID_CREDENTIALS.statusCode,
+      );
     }
 
     const token = tokenService.generateActionToken(
@@ -178,7 +178,10 @@ class AuthService {
   public async accountRestore(dto: IAccountRestoreRequestDto): Promise<void> {
     const user = await userRepository.getByEmail(dto.email);
     if (!user) {
-      throw new ApiError("Invalid email", 404);
+      throw new ApiError(
+        ERRORS.INVALID_CREDENTIALS.message,
+        ERRORS.INVALID_CREDENTIALS.statusCode,
+      );
     }
 
     const token = tokenService.generateActionToken(
@@ -202,11 +205,11 @@ class AuthService {
   ): Promise<void> {
     await oldPasswordRepository.deleteManyByUserId(payload.userId);
 
-    // TODO: set deletedAt to null
     const password = await passwordService.hashPassword(dto.password);
     await userRepository.updateById(payload.userId, {
       password,
       isDeleted: false,
+      deletedAt: null,
     });
 
     await actionTokenRepository.deleteOneByParams({ token: dto.token });
@@ -230,6 +233,8 @@ class AuthService {
     // CHANGE CASE:
     // - NEW_PASSWORD must not be equal to CURRENT_PASSWORD stored in DB                #case1
     // - NEW_PASSWORD must not match any password from the POOL_OF_OLD_PASSWORDS        #case2
+
+    // #case3 implemented at AuthService.isPasswordCorrectOrThrow()
     // - OLD_PASSWORD (sent by user) must match CURRENT_PASSWORD stored in DB           #case3
 
     // case#1
@@ -239,7 +244,10 @@ class AuthService {
     );
 
     if (isNewPasswordEqualsCurrent) {
-      throw new ApiError("You can not set the old password", 401);
+      throw new ApiError(
+        ERRORS.PASSWORD_REUSE_FORBIDDEN.message,
+        ERRORS.PASSWORD_REUSE_FORBIDDEN.statusCode,
+      );
     }
 
     const docs = await oldPasswordRepository.getMany(userId);
@@ -251,7 +259,10 @@ class AuthService {
         doc.password,
       );
       if (isSame) {
-        throw new ApiError("You can not set the old password", 401);
+        throw new ApiError(
+          ERRORS.PASSWORD_REUSE_FORBIDDEN.message,
+          ERRORS.PASSWORD_REUSE_FORBIDDEN.statusCode,
+        );
       }
     }
 
@@ -268,7 +279,10 @@ class AuthService {
     );
 
     if (!flag) {
-      throw new ApiError("Incorrect password", 401);
+      throw new ApiError(
+        ERRORS.INVALID_CREDENTIALS.message,
+        ERRORS.INVALID_CREDENTIALS.statusCode,
+      );
     }
   }
 }

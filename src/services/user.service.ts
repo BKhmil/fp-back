@@ -1,3 +1,4 @@
+import { ERRORS } from "../constants/errors.constant";
 import { ApiError } from "../errors/api.error";
 import { ITokenPayload } from "../interfaces/token.interface";
 import {
@@ -26,8 +27,8 @@ class UserService {
     return userPresenter.toResponse(
       await this.findUserOrThrow(
         tokenPayload.userId,
-        "Unexpected error: user not found after authentication",
-        500,
+        ERRORS.USER_NOT_FOUND_AFTER_AUTH.message,
+        ERRORS.USER_NOT_FOUND_AFTER_AUTH.statusCode,
       ),
     );
   }
@@ -38,8 +39,8 @@ class UserService {
   ): Promise<IUserResponseDto> {
     const user = await this.findUserOrThrow(
       tokenPayload.userId,
-      "Unexpected error: user not found after authentication",
-      500,
+      ERRORS.USER_NOT_FOUND_AFTER_AUTH.message,
+      ERRORS.USER_NOT_FOUND_AFTER_AUTH.statusCode,
     );
     return userPresenter.toResponse(
       await userRepository.updateById(user._id, dto),
@@ -49,8 +50,8 @@ class UserService {
   public async deleteMe(tokenPayload: ITokenPayload): Promise<void> {
     await this.findUserOrThrow(
       tokenPayload.userId,
-      "Unexpected error: user not found after authentication",
-      500,
+      ERRORS.USER_NOT_FOUND_AFTER_AUTH.message,
+      ERRORS.USER_NOT_FOUND_AFTER_AUTH.statusCode,
     );
 
     await userRepository.softDeleteById(tokenPayload.userId);
@@ -62,7 +63,11 @@ class UserService {
 
   public async getUserById(userId: string): Promise<IUserResponseDto> {
     return userPresenter.toResponse(
-      await this.findUserOrThrow(userId, "User not found", 404),
+      await this.findUserOrThrow(
+        userId,
+        ERRORS.USER_NOT_FOUND.message,
+        ERRORS.USER_NOT_FOUND.statusCode,
+      ),
     );
   }
 

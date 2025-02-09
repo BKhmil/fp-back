@@ -4,6 +4,7 @@ import swaggerUi from "swagger-ui-express";
 
 import { envConfig } from "./configs/env.config";
 import { swaggerDocs } from "./configs/swagger.config";
+import { ERRORS } from "./constants/errors.constant";
 import { cronRunner } from "./crons";
 import { ApiError } from "./errors/api.error";
 import { apiRouter } from "./routers/api.router";
@@ -20,8 +21,8 @@ app.use("/api", apiRouter);
 app.use(
   "*",
   (error: ApiError, req: Request, res: Response, next: NextFunction) => {
-    const status = error.statusCode || 500;
-    const message = error.message ?? "Something went wrong";
+    const status = error.statusCode || ERRORS.DEFAULT.statusCode;
+    const message = error.message ?? ERRORS.DEFAULT.message;
 
     res.status(status).json({ status, message });
   },
@@ -42,7 +43,7 @@ app.listen(envConfig.APP_PORT, async () => {
       envConfig.APP_PORT,
   );
   console.log(
-    "Server is available on http://" +
+    "Swagger is available on http://" +
       envConfig.APP_HOST +
       ":" +
       envConfig.APP_PORT +

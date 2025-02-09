@@ -2,6 +2,7 @@ import * as jwt from "jsonwebtoken";
 import ms from "ms";
 
 import { envConfig } from "../configs/env.config";
+import { ERRORS } from "../constants/errors.constant";
 import { ActionTokenTypeEnum } from "../enums/action-token-type.enum";
 import { TokenTypeEnum } from "../enums/token-type.enum";
 import { ApiError } from "../errors/api.error";
@@ -44,7 +45,10 @@ class TokenService {
         expiresIn = envConfig.ACTION_ACCOUNT_RESTORE_EXPIRATION;
         break;
       default:
-        throw new ApiError("Invalid action token type", 500);
+        throw new ApiError(
+          ERRORS.INVALID_TOKEN_TYPE.message,
+          ERRORS.INVALID_TOKEN_TYPE.statusCode,
+        );
     }
     return jwt.sign(payload, secret, {
       expiresIn: expiresIn as ms.StringValue,
@@ -75,16 +79,16 @@ class TokenService {
           secret = envConfig.ACTION_ACCOUNT_RESTORE_SECRET;
           break;
         default:
-          throw new Error("Invalid token type");
+          throw new Error(ERRORS.INVALID_TOKEN_TYPE.message);
       }
 
       return jwt.verify(token, secret) as ITokenPayload;
     } catch (err) {
       throw new ApiError(
-        err.message.includes("Invalid token type")
+        err.message.includes(ERRORS.INVALID_TOKEN_TYPE.message)
           ? err.message
-          : "Invalid or expired token",
-        401,
+          : ERRORS.INVALID_TOKEN.message,
+        ERRORS.INVALID_TOKEN.statusCode,
       );
     }
   }

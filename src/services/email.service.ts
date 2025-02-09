@@ -3,6 +3,7 @@ import nodemailer, { Transporter } from "nodemailer";
 import React from "react";
 
 import { envConfig } from "../configs/env.config";
+import { ERRORS } from "../constants/errors.constant";
 import { EmailTypeEnum } from "../enums/email-type.enum";
 import { ApiError } from "../errors/api.error";
 import { AccountRestoreEmail } from "../templates/AccountRestore";
@@ -72,7 +73,10 @@ class EmailService {
           );
           break;
         default:
-          throw new ApiError("Unknown email type", 500);
+          throw new ApiError(
+            ERRORS.UNKNOWN_EMAIL_TYPE.message,
+            ERRORS.UNKNOWN_EMAIL_TYPE.statusCode,
+          );
       }
 
       const options = {
@@ -84,7 +88,8 @@ class EmailService {
 
       await this.transporter.sendMail(options);
     } catch (err) {
-      throw new Error("Can't send email: " + err.message);
+      const { message, statusCode } = ERRORS.EMAIL_SEND_FAILED(err);
+      throw new ApiError(message, statusCode);
     }
   }
 
