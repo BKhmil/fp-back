@@ -13,16 +13,36 @@ ts
 npm run seed:ts
 ```
 
-js
-```sh
-npm run seed
-```
-
 then run the server
 
 ```sh
 npm run start:dev
 ```
+
+------------------------------------------------------------------ 
+
+To start the production server, run the following commands:
+
+```sh
+npm install
+```
+Seeding the Database
+
+js
+```sh
+npm run seed
+```
+
+then run
+
+```sh
+npm run build
+```
+```sh
+npm start
+```
+
+
 
 ⚠ Important:
 All users have the same password: "fffff11???"

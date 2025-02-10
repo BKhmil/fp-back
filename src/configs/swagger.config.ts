@@ -1,5 +1,3 @@
-import path from "node:path";
-
 import swaggerJsdoc from "swagger-jsdoc";
 
 import { envConfig } from "./env.config";
@@ -237,7 +235,7 @@ const swaggerOptions: swaggerJsdoc.Options = {
       },
     },
   },
-  apis: [path.join(__dirname, "..", "routers", "*.ts")],
+  apis: ["**/routers/**/*.ts", "**/routers/**/*.js"],
 };
 
 export const swaggerDocs = swaggerJsdoc(swaggerOptions);
