@@ -138,6 +138,102 @@ const swaggerOptions: swaggerJsdoc.Options = {
             },
           },
         },
+        Post: {
+          type: "object",
+          properties: {
+            _id: {
+              type: "string",
+              example: "67a93caec0275180ed96c961",
+            },
+            title: {
+              type: "string",
+              example: "New title",
+            },
+            text: {
+              type: "string",
+              example: "lorem ipsum dolore sit amet",
+            },
+            _userId: {
+              type: "string",
+              example: "67a91cb50aabde43f353ac59",
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-02-01T12:00:00.000Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              example: "2025-02-05T15:30:00.000Z",
+            },
+          },
+        },
+        PostResponse: {
+          type: "object",
+          properties: {
+            _id: {
+              type: "string",
+              example: "67a93caec0275180ed96c961",
+            },
+            title: {
+              type: "string",
+              example: "New title",
+            },
+            text: {
+              type: "string",
+              example: "lorem ipsum dolore sit amet",
+            },
+            createdAt: {
+              type: "string",
+              format: "date-time",
+              example: "2024-02-01T12:00:00.000Z",
+            },
+            updatedAt: {
+              type: "string",
+              format: "date-time",
+              example: "2024-02-05T15:30:00.000Z",
+            },
+          },
+        },
+        PostListResponse: {
+          type: "object",
+          properties: {
+            data: {
+              type: "array",
+              items: {
+                $ref: "#/components/schemas/PostResponse",
+              },
+            },
+            total: {
+              type: "integer",
+              example: 100,
+            },
+            page: {
+              type: "integer",
+              example: 1,
+            },
+            limit: {
+              type: "integer",
+              example: 10,
+            },
+            title: {
+              type: "string",
+              nullable: true,
+              example: "New Title",
+            },
+            order: {
+              type: "string",
+              enum: ["asc", "desc"],
+              example: "asc",
+            },
+            orderBy: {
+              type: "string",
+              enum: ["title", "createdAt"],
+              example: "createdAt",
+            },
+          },
+        },
       },
     },
   },

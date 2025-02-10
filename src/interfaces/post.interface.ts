@@ -14,6 +14,11 @@ export type IPostCreateRequestDto = Pick<IPost, "title" | "text">;
 
 export type IPostUpdateRequestDto = Pick<IPost, "title" | "text">;
 
+export type IPostResponseDto = Pick<
+  IPost,
+  "_id" | "title" | "text" | "createdAt" | "updatedAt"
+>;
+
 export type IPostListQuery = {
   page: number;
   limit: number;
@@ -21,3 +26,9 @@ export type IPostListQuery = {
   order: OrderEnum;
   orderBy: PostListOrderEnum;
 };
+
+export interface IPostListResponseDto extends IPostListQuery {
+  data: IPostResponseDto[];
+  userId: string;
+  total: number;
+}

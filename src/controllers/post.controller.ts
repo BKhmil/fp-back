@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 
+import { SUCCESS_CODES } from "../constants/success-codes.constant";
 import {
   IPostCreateRequestDto,
   IPostListQuery,
@@ -26,7 +27,7 @@ class PostController {
       const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
       const dto = req.body as IPostCreateRequestDto;
       const result = await postService.create(tokenPayload, dto);
-      res.json(result);
+      res.status(SUCCESS_CODES.CREATED).json(result);
     } catch (err) {
       next(err);
     }
@@ -48,8 +49,8 @@ class PostController {
     try {
       const postId = req.params.postId as string;
       const tokenPayload = req.res.locals.tokenPayload as ITokenPayload;
-      const result = await postService.delete(tokenPayload, postId);
-      res.json(result);
+      await postService.delete(tokenPayload, postId);
+      res.sendStatus(SUCCESS_CODES.NO_CONTENT);
     } catch (err) {
       next(err);
     }

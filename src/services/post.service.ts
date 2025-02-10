@@ -4,18 +4,20 @@ import {
   IPost,
   IPostCreateRequestDto,
   IPostListQuery,
+  IPostListResponseDto,
   IPostUpdateRequestDto,
 } from "../interfaces/post.interface";
 import { ITokenPayload } from "../interfaces/token.interface";
+import { postPresenter } from "../presenters/post.presenter";
 import { postRepository } from "../repositories/post.repository";
 
 class PostService {
   public async getList(
     userId: string,
     query: IPostListQuery,
-  ): Promise<{ entities: IPost[]; total: number }> {
+  ): Promise<IPostListResponseDto> {
     const { entities, total } = await postRepository.getList(query, userId);
-    return { entities, total };
+    return postPresenter.toResponseList(entities, total, query, userId);
   }
 
   public async create(
@@ -25,7 +27,6 @@ class PostService {
     return await postRepository.create(dto, tokenPayload.userId);
   }
 
-  // TODO PostPresenter
   public async update(
     tokenPayload: ITokenPayload,
     postId: string,
